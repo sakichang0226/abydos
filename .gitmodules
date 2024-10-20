@@ -1,0 +1,3 @@
+[submodule "schale"]
+	path = schale
+	url = https://github.com/sakichang0226/schale.git

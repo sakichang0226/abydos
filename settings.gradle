@@ -1,0 +1,5 @@
+include 'common'
+include 'items-api'
+
+include 'product-database'
+project(':product-database').projectDir = file('schale/product-database')
