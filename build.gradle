@@ -57,6 +57,7 @@ project(':common') {
 
 project(':items-api') {
 	dependencies {
+		implementation project(':common')
 		implementation project(':product-database')
 	}
 
