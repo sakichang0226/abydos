@@ -31,12 +31,13 @@ subprojects {
 	dependencies {
 		implementation 'org.springframework.boot:spring-boot-starter-web'
 		implementation 'org.projectlombok:lombok'
+		implementation 'org.springframework:spring-tx'
+		implementation 'org.springframework.boot:spring-boot-starter-validation'
 		testImplementation 'org.springframework.boot:spring-boot-starter-test'
 		testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	}
 
 }
-
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
@@ -45,6 +46,10 @@ dependencies {
 }
 
 project(':common') {
+	dependencies {
+		implementation project(':product-database')
+	}
+
 	jar {
 		enabled = false
 		archiveBaseName.set("common")
@@ -58,7 +63,7 @@ project(':common') {
 project(':items-api') {
 	dependencies {
 		implementation project(':common')
-		implementation project(':product-database')
+		implementation project(":product-database")
 	}
 
 	jar {
