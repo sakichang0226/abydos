@@ -18,7 +18,7 @@ public class ItemConverter {
                     .categoryId(item.getCategoryId())
                     .price(item.getPrice())
                     .description(item.getDescription())
-                    .isStopped(item.getIs_stopped())
+                    .isStopped(item.getIsStopped())
                     .purchaseNum(item.getPurchaseNum())
                     .stock(item.getStock())
                     .build();
