@@ -1,6 +1,5 @@
 package com.project.abydos.saki.api.items.controller;
 
-import com.project.abydos.saki.api.items.constant.EndPoint;
 import com.project.abydos.saki.api.items.logic.ItemLogic;
 import com.project.abydos.saki.api.items.response.ItemInfoResponse;
 import com.project.abydos.saki.common.constant.ErrorMessage;
