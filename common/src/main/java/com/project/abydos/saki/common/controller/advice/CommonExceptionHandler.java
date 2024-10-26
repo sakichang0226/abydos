@@ -10,25 +10,26 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.beans.TypeMismatchException;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
-
-import jakarta.validation.ConstraintViolationException;
 
 import java.text.MessageFormat;
 
 import static com.project.abydos.saki.common.constant.ErrorCodes.*;
 
 /**
- *　
+ * プロジェクト間で共通に使用するエラーレスポンスのハンドリングを管理するクラス<br>
+ * 機能固有のエラーハンドリングは個々のパッケージで定義すること
  */
-@ControllerAdvice
+@RestControllerAdvice
 @Slf4j
 @RequiredArgsConstructor
-public class CommonExceptionHandler {
+public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
 
     private final HttpServletRequest request;
 
@@ -48,17 +49,21 @@ public class CommonExceptionHandler {
     }
 
     /**
-     * リクエスト内容に問題があるときにハンドリングする共通例外
+     * パスパラメータ、リクエストパラメータの型が不整合の時に返すエラーハンドリング
      *
-     * @param exception 例外クラス
+     * @param ex 例外クラス
+     * @param headers HTTPヘッダー
+     * @param status HTTPステータス
+     * @param request　リクエストパラメータ
      * @return API_ERR001のエラーレスポンス
      */
-    @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ErrorInfo> handleException(ConstraintViolationException exception){
-        log.warn(exception.getMessage());
+    @Override
+    protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        log.warn(ex.getMessage());
 
         return new ResponseEntity<>(
                 createErrorResponse(VALIDATION_ERROR.getErrorCode(), VALIDATION_ERROR.getMessage()),
+                headers,
                 HttpStatus.BAD_REQUEST);
     }
 
@@ -78,17 +83,21 @@ public class CommonExceptionHandler {
     }
 
     /**
-     * 対象のデータがなかった時にハンドリングする共通例外
+     * 存在しないパスでアクセスした時に対応するエラーハンドリング
      *
-     * @param exception 例外クラス
+     * @param ex 例外クラス
+     * @param headers HTTPヘッダー
+     * @param status HTTPステータス
+     * @param request　リクエストパラメータ
      * @return API_ERR002のエラーレスポンス
      */
-    @ExceptionHandler(NoResourceFoundException.class)
-    public ResponseEntity<ErrorInfo> handleException(NoResourceFoundException exception){
-        log.warn(exception.getMessage());
+    @Override
+    protected ResponseEntity<Object> handleNoResourceFoundException(NoResourceFoundException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        log.warn(ex.getMessage());
 
         return new ResponseEntity<>(
                 createErrorResponse(DATA_NOT_FOUND.getErrorCode(), DATA_NOT_FOUND.getMessage()),
+                headers,
                 HttpStatus.NOT_FOUND);
     }
 
@@ -122,7 +131,7 @@ public class CommonExceptionHandler {
     @Builder
     @Data
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-    private static class ErrorInfo {
+    public static class ErrorInfo {
 
         /** エラーコード */
         private String errorCode;
