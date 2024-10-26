@@ -1,5 +1,6 @@
 package com.project.abydos.saki.api.items.logic;
 
+import com.project.abydos.saki.api.items.constant.LogMessage;
 import com.project.abydos.saki.api.items.converter.ItemConverter;
 import com.project.abydos.saki.api.items.response.ItemInfoResponse;
 import com.project.abydos.saki.common.constant.ErrorMessage;
@@ -34,7 +35,7 @@ public class ItemLogic {
 
         Item item = itemService.fetchItemInfo(itemId)
                         .orElseThrow(() -> new NotFoundException(ErrorMessage.DATA_NOT_FOUND,
-                                MessageFormat.format("itemId={0}", itemId)));
+                                MessageFormat.format(LogMessage.ITEM.getMessage(), itemId)));
 
         String imageUrl = imageService.findImageByItemId(itemId).map(Image::getImageUrl).orElse("");
 
