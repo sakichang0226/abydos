@@ -5,9 +5,9 @@ package com.project.abydos.saki.common.constant;
  */
 public enum ErrorCodes {
 
-    INTERNAL_SERVER_ERROR("API_ERR000", "[{0}] internal Server Error."),
-    VALIDATION_ERROR("API_ERR001", "[{0}] validation Check Error."),
-    DATA_NOT_FOUND("API_ERR002", "[{0}] data not found.");
+    INTERNAL_SERVER_ERROR("API_ERROR000", "[{0}] internal Server Error."),
+    VALIDATION_ERROR("API_ERROR001", "[{0}] validation Check Error."),
+    DATA_NOT_FOUND("API_ERROR002", "[{0}] data not found.");
 
     private final String code;
 

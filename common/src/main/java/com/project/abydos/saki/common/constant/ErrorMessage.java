@@ -1,7 +1,7 @@
 package com.project.abydos.saki.common.constant;
 
 /**
- *
+ * WARN,ERRORレベルのログ出力でパッケージ間で共通で使用するものをまとめたクラス
  */
 public enum ErrorMessage {
 
