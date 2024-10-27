@@ -7,7 +7,9 @@ package com.project.abydos.saki.api.items.constant;
 public enum LogMessage {
 
     /** 対象商品のIdを出力する　*/
-    ITEM("itemId = {0}");
+    ITEM("itemId = {0}"),
+    /** 対象店舗のIdを出力する */
+    SHOP("shopId = {0}");
 
     private final String message;
 
