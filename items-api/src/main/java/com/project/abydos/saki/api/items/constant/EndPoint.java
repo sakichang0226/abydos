@@ -14,4 +14,7 @@ public class EndPoint {
     /** 商品情報取得　*/
     public static final String ITEMS = "/items";
 
+    /** 店舗情報取得 */
+    public static final String SHOP = "/shops";
+
 }

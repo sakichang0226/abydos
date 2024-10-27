@@ -13,3 +13,11 @@ INSERT INTO IMAGES (item_id, name, image_url) VALUES
 (3, 'image1_item3.jpg', ''),
 (4, 'image1_item4.jpg', ''),
 (5, 'image1_item5.jpg', '');
+
+/* 店舗用 */
+INSERT INTO SHOPS (name) VALUES
+('Shop Alpha'),
+('Shop Beta'),
+('Shop Gamma'),
+('Shop Delta'),
+('Shop Epsilon');
