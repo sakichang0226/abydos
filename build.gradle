@@ -31,20 +31,31 @@ subprojects {
 	dependencies {
 		implementation 'org.springframework.boot:spring-boot-starter-web'
 		implementation 'org.projectlombok:lombok'
+		implementation 'org.springframework:spring-tx'
+		implementation 'org.springframework.boot:spring-boot-starter-validation'
+		implementation 'org.apache.commons:commons-lang3:3.12'
 		testImplementation 'org.springframework.boot:spring-boot-starter-test'
 		testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+		testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:2.1.4'
 	}
 
 }
 
-
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 project(':common') {
+	dependencies {
+		implementation project(':product-database')
+		testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
+		testImplementation 'com.h2database:h2'
+		testImplementation 'org.flywaydb:flyway-core'
+	}
+
 	jar {
 		enabled = false
 		archiveBaseName.set("common")
@@ -57,7 +68,8 @@ project(':common') {
 
 project(':items-api') {
 	dependencies {
-		implementation project(':product-database')
+		implementation project(':common')
+		implementation project(":product-database")
 	}
 
 	jar {
