@@ -12,7 +12,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.*;
 
 /**
- *
+ * カテゴリ情報取得APIに関するサービス層
  */
 @Service
 @RequiredArgsConstructor
@@ -20,10 +20,13 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
 
+    /**
+     * キー：カテゴリId、バリュー:　カテゴリ情報
+     */
     Map<Long, Category> categoryTrees = new HashMap<>();
 
     /**
-     *
+     * 起動時にDBからカテゴリIdを取得し、カテゴリId、カテゴリ情報をまとめたインデックスを生成する
      */
     @PostConstruct
     @Async
@@ -39,9 +42,9 @@ public class CategoryService {
     }
 
     /**
-     *
-     * @param categoryId
-     * @return
+     * 指定したカテゴリIdが存在する場合、そのカテゴリの情報を返す
+     * @param categoryId カテゴリId
+     * @return カテゴリIdに対応するカテゴリ情報
      */
     public Optional<Category> findCategory(@NonNull Long categoryId) {
         return categoryTrees.containsKey(categoryId) ? Optional.of(categoryTrees.get(categoryId)) : Optional.empty();
@@ -69,16 +72,6 @@ public class CategoryService {
         }
 
         return parentCategories;
-    }
-
-
-    public Map<Long, Category> getCategoryTrees() {
-
-        if (isEmptyCategoryTree()) {
-            createCategoryTree();
-        }
-
-        return this.categoryTrees;
     }
 
     /**
