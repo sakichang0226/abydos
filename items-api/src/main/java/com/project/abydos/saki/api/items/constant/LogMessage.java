@@ -9,7 +9,11 @@ public enum LogMessage {
     /** 対象商品のIdを出力する　*/
     ITEM("itemId = {0}"),
     /** 対象店舗のIdを出力する */
-    SHOP("shopId = {0}");
+    SHOP("shopId = {0}"),
+    /** 対象カテゴリのIdを出力する */
+    CATEGORY("categoryId = {0}"),
+    /** カテゴリツリーの再初期化 */
+    INITIALIZE_CATEGORY_TREE("initialize Category Tree.");
 
     private final String message;
 
