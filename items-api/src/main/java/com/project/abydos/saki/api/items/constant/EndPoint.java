@@ -17,4 +17,7 @@ public class EndPoint {
     /** 店舗情報取得 */
     public static final String SHOP = "/shops";
 
+    /** カテゴリ情報取得 */
+    public static final String CATEGORIES = "/categories";
+
 }

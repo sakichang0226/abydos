@@ -16,8 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.text.MessageFormat;
 
-import static com.project.abydos.saki.api.items.constant.EndPoint.API;
-import static com.project.abydos.saki.api.items.constant.EndPoint.V1;
+import static com.project.abydos.saki.api.items.constant.EndPoint.*;
 
 /**
  * カテゴリ情報取得APIのコントローラ層
@@ -34,7 +33,7 @@ public class CategoryController {
      * @param categoryId カテゴリId
      * @return カテゴリ情報
      */
-    @GetMapping("/categories/{category_id}")
+    @GetMapping(CATEGORIES + "/{category_id}")
     public ResponseEntity<CategoryResponse> findCategoryTreeByCategoryId(@PathVariable("category_id") @Valid Long categoryId) {
         return logic.findCategoryTreeByCategoryId(categoryId).map(c -> new ResponseEntity<>(c, HttpStatus.OK))
                 .orElseThrow(() ->new NotFoundException(ErrorMessage.DATA_NOT_FOUND,
