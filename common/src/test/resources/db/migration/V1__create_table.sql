@@ -28,3 +28,12 @@ CREATE TABLE SHOPS (
    create_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
    update_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE CATEGORIES (
+   category_id         INT PRIMARY KEY NOT NULL,
+   parent_category_id  INT NOT NULL,
+   name                VARCHAR(100) NOT NULL,
+   create_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+   update_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+   depth               INT NOT NULL
+);
