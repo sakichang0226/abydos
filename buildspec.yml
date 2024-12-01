@@ -1,0 +1,19 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto17
+
+  pre_build:
+    commands:
+      - chmod +x ./gradlew
+      - ./gradlew clean
+
+  build:
+    commands:
+      - ./gradlew :$TARGET_SERVICE:build
+
+  post_build:
+    commands:
+      - aws s3 cp $TARGET_SERVICE/build/libs/$TARGET_SERVICE.jar s3://abydos-api-build/$TARGET_SERVICE/
