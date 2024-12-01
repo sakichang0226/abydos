@@ -4,6 +4,9 @@ phases:
   install:
     runtime-versions:
       java: corretto17
+    commands:
+      - git submodule init # サブモジュールを初期化
+      - git submodule update --recursive # サブモジュールを最新のコミットIDに更新
 
   pre_build:
     commands:
