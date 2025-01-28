@@ -20,11 +20,13 @@ phases:
   build:
     commands:
       - ./gradlew :$TARGET_SERVICE:build
+      - docker build -t $REPOSITORY_URI:latest ./$TARGET_SERVICE/
+      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
 
   post_build:
     commands:
-      - docker build -t $REPOSITORY_URI:latest ./$TARGET_SERVICE/
-      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+      - docker push $REPOSITORY_URI:latest
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
       - printf '[{"name":"%s","imageUri":"%s"}]' $TARGET_SERVICE $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
 artifacts:
   files: imagedefinitions.json
