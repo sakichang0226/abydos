@@ -28,8 +28,8 @@ public class CategoryService {
     /**
      * 起動時にDBからカテゴリIdを取得し、カテゴリId、カテゴリ情報をまとめたインデックスを生成する
      */
-    @PostConstruct
-    @Async
+    //@PostConstruct
+    //@Async
     public void createCategoryTree() {
         List<Category> categories = categoryRepository.findAll();
         List<Category> sortedCategories = categories.stream().sorted(Comparator.comparing(Category::getDepth)).toList();
