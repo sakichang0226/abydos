@@ -20,6 +20,7 @@ phases:
   build:
     commands:
       - ./gradlew :$TARGET_SERVICE:build
+      - ./gradlew :$TARGET_SERVICE:clean :$TARGET_SERVICE:bootJar
       - docker build -t $REPOSITORY_URI:latest ./$TARGET_SERVICE/
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
 
