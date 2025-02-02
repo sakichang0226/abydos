@@ -36,7 +36,7 @@ subprojects {
 		testImplementation 'org.springframework.boot:spring-boot-starter-test'
 		testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 		testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:2.1.4'
-		compileOnly 'org.projectlombok:lombok'
+		implementation 'org.projectlombok:lombok'
 		annotationProcessor 'org.projectlombok:lombok'
 	}
 
@@ -59,7 +59,7 @@ project(':common') {
 	}
 
 	jar {
-		enabled = false
+		enabled = true
 		archiveBaseName.set("common")
 	}
 
