@@ -8,7 +8,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import static com.project.abydos.saki.api.items.constant.EndPoint.*;
 
@@ -28,7 +31,6 @@ public class ItemController {
      * @return 商品情報
      */
     @GetMapping(ITEMS + "/{item_id}")
-    @CrossOrigin
     public ResponseEntity<ItemInfoResponse> getItemDetail(@PathVariable("item_id") @Valid Long itemId) {
 
         return logic.findItemInfo(itemId)
