@@ -1,0 +1,33 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto17
+    commands:
+      - git submodule init # サブモジュールを初期化
+      - git submodule update --recursive # サブモジュールを最新のコミットIDに更新
+
+  pre_build:
+    commands:
+      - chmod +x ./gradlew
+      - ./gradlew clean
+      - aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin 198146067243.dkr.ecr.ap-northeast-1.amazonaws.com
+      - REPOSITORY_URI=198146067243.dkr.ecr.ap-northeast-1.amazonaws.com/abydos/$TARGET_SERVICE
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=${COMMIT_HASH:=latest}
+
+  build:
+    commands:
+      - ./gradlew :$TARGET_SERVICE:build
+      - ./gradlew :$TARGET_SERVICE:clean :$TARGET_SERVICE:bootJar
+      - docker build -t $REPOSITORY_URI:latest ./$TARGET_SERVICE/
+      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+
+  post_build:
+    commands:
+      - docker push $REPOSITORY_URI:latest
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - printf '[{"name":"%s","imageUri":"%s"}]' $TARGET_SERVICE $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+artifacts:
+  files: imagedefinitions.json
