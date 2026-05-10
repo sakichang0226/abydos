@@ -1,4 +1,4 @@
-package com.project.abydos.saki.api.items;
+package com.project.abydos.saki.api.products;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
