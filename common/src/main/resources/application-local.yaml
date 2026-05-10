@@ -1,7 +1,0 @@
-spring:
-  application:
-    name: common
-
-security:
-  jwt:
-    secret: test1w235dfageerttgearyt
