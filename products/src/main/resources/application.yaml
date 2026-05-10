@@ -4,3 +4,13 @@ server:
 spring:
   application:
     name: products-api
+  profiles:
+    include:
+      - common
+      - dynamodb
+    group:
+      local: dynamodb-local,common-local
+      dev: dynamodb-dev
+  docker:
+    compose:
+      enabled: false

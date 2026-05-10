@@ -1,3 +1,5 @@
-aws:
-  dynamodb:
-    endpoint: http://localhost:8000
+spring:
+  docker:
+    compose:
+      enabled: true
+      lifecycle-management: start-and-stop

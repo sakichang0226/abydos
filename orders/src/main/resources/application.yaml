@@ -4,8 +4,13 @@ server:
 spring:
   application:
     name: orders-api
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: ${JWT_ISSUER_URI:http://localhost:8080}
+  profiles:
+    include:
+      - common
+      - dynamodb
+    group:
+      local: dynamodb-local,common-local
+      dev: dynamodb-dev
+  docker:
+    compose:
+      enabled: false
