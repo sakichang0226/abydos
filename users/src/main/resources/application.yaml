@@ -1,0 +1,16 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: users-api
+  profiles:
+    include:
+      - common
+      - dynamodb
+    group:
+      local: dynamodb-local,common-local
+      dev: dynamodb-dev
+  docker:
+    compose:
+      enabled: false
