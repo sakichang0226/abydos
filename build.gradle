@@ -75,6 +75,7 @@ project(':products') {
 
 	bootJar {
 		enabled = true
+		archiveFileName.set("products.jar")
 		launchScript()
 	}
 }
@@ -92,6 +93,7 @@ project(':orders') {
 
 	bootJar {
 		enabled = true
+		archiveFileName.set("orders.jar")
 		launchScript()
 	}
 }
@@ -113,6 +115,7 @@ project(':users') {
 
 	bootJar {
 		enabled = true
+		archiveFileName.set("users.jar")
 		launchScript()
 	}
 }
