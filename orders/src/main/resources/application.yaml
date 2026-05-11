@@ -5,12 +5,17 @@ spring:
   application:
     name: orders-api
   profiles:
-    include:
-      - common
-      - dynamodb
     group:
-      local: dynamodb-local,common-local
-      dev: dynamodb-dev
+      local:
+        - common
+        - common-local
+        - dynamodb
+        - dynamodb-local
+      dev:
+        - common
+        - common-dev
+        - dynamodb
+        - dynamodb-dev
   docker:
     compose:
       enabled: false
