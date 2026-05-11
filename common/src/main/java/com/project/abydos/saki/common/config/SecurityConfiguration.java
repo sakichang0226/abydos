@@ -25,6 +25,8 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfiguration {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+
     private final CustomUserDetailService customUserDetailService;
 
     @Bean
@@ -56,6 +58,9 @@ public class SecurityConfiguration {
                                 .requestMatchers(Endpoint.HEALTH).permitAll()
                                 .requestMatchers(Endpoint.API_PREFIX + Endpoint.LOGIN).permitAll()
                                 .anyRequest().authenticated()
+                )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
                 );
 
         return http.build();

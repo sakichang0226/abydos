@@ -18,7 +18,9 @@ public enum CommonErrorLogMessage {
     /** 想定外の例外発生時 */
     UNEXPECTED_EXCEPTION("Unexpected exception occurred: {}"),
     /** ユーザーが見つからない場合 */
-    USER_NOT_FOUND("User not found: {}");
+    USER_NOT_FOUND("User not found: {}"),
+    /** 未認証アクセス時 */
+    UNAUTHORIZED_ACCESS("Unauthorized access: {}");
 
     private final String message;
 }
