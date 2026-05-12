@@ -1,6 +1,6 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.3.4'
+	id 'org.springframework.boot' version '3.5.9'
 	id 'io.spring.dependency-management' version '1.1.6'
 }
 
@@ -30,13 +30,13 @@ subprojects {
 
 	dependencies {
 		implementation 'org.springframework.boot:spring-boot-starter-web'
-		implementation 'org.projectlombok:lombok'
+		implementation 'org.springframework.boot:spring-boot-starter-validation'
+		compileOnly 'org.projectlombok:lombok'
+		annotationProcessor 'org.projectlombok:lombok'
 		testImplementation 'org.springframework.boot:spring-boot-starter-test'
 		testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	}
-
 }
-
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
@@ -45,8 +45,15 @@ dependencies {
 }
 
 project(':common') {
+	dependencies {
+		api project(':dynamodb')
+		api 'org.springframework.boot:spring-boot-starter-security'
+		api 'com.auth0:java-jwt:4.2.2'
+		implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+	}
+
 	jar {
-		enabled = false
+		enabled = true
 		archiveBaseName.set("common")
 	}
 
@@ -55,18 +62,60 @@ project(':common') {
 	}
 }
 
-project(':items-api') {
+project(':products') {
 	dependencies {
-		implementation project(':product-database')
+		implementation project(':common')
+		implementation project(':dynamodb')
 	}
 
 	jar {
 		enabled = false
-		archiveBaseName.set("items-api")
+		archiveBaseName.set("products")
 	}
 
 	bootJar {
 		enabled = true
+		archiveFileName.set("products.jar")
+		launchScript()
+	}
+}
+
+project(':orders') {
+	dependencies {
+		implementation project(':common')
+		implementation project(':dynamodb')
+	}
+
+	jar {
+		enabled = false
+		archiveBaseName.set("orders")
+	}
+
+	bootJar {
+		enabled = true
+		archiveFileName.set("orders.jar")
+		launchScript()
+	}
+}
+
+project(':users') {
+	dependencies {
+		implementation project(':common')
+		developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
+	}
+
+	bootRun {
+		workingDir = rootProject.projectDir
+	}
+
+	jar {
+		enabled = false
+		archiveBaseName.set("users")
+	}
+
+	bootJar {
+		enabled = true
+		archiveFileName.set("users.jar")
 		launchScript()
 	}
 }

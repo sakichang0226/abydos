@@ -1,5 +1,10 @@
 include 'common'
-include 'items-api'
+include 'products'
+include 'orders'
+include 'users'
 
 include 'product-database'
 project(':product-database').projectDir = file('schale/product-database')
+
+include 'dynamodb'
+project(':dynamodb').projectDir = file('schale/dynamodb')

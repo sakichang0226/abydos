@@ -1,0 +1,3 @@
+security:
+  jwt:
+    secret: local-dev-secret-key-for-testing-only
