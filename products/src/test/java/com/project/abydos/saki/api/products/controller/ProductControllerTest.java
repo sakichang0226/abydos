@@ -2,6 +2,7 @@ package com.project.abydos.saki.api.products.controller;
 
 import com.project.abydos.saki.api.products.facade.ProductFacade;
 import com.project.abydos.saki.api.products.response.ProductResponse;
+import com.project.abydos.saki.api.products.response.ProductsResponse;
 import com.project.abydos.saki.common.exception.DataNotFoundException;
 import com.project.abydos.saki.common.exception.GlobalExceptionHandler;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +15,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
+
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -90,5 +96,82 @@ class ProductControllerTest {
         mockMvc.perform(get("/api/v1/products/abc"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error_code").value("API_ERR001"));
+    }
+
+    @Test
+    void 商品一覧取得_正常系() throws Exception {
+        ProductsResponse response = ProductsResponse.builder()
+                .products(List.of(
+                        ProductsResponse.Product.builder()
+                                .productId(1L)
+                                .productName("テスト商品1")
+                                .description("テスト説明1")
+                                .imageUrl("https://example.com/1.png")
+                                .shopId(10L)
+                                .categoryId(5L)
+                                .price(1000L)
+                                .taxType("I")
+                                .rating(4.0)
+                                .reviewCount(12L)
+                                .stock(50L)
+                                .status("O")
+                                .createdAt(1700000000000L)
+                                .build(),
+                        ProductsResponse.Product.builder()
+                                .productId(2L)
+                                .productName("テスト商品2")
+                                .description("テスト説明2")
+                                .imageUrl("https://example.com/2.png")
+                                .shopId(20L)
+                                .categoryId(10L)
+                                .price(2000L)
+                                .taxType("E")
+                                .rating(4.5)
+                                .reviewCount(38L)
+                                .stock(120L)
+                                .status("O")
+                                .createdAt(1700000000000L)
+                                .build()
+                ))
+                .build();
+
+        when(productFacade.getProducts(List.of(1L, 2L))).thenReturn(response);
+
+        mockMvc.perform(get("/api/v1/products").param("product_ids", "1,2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.products.length()").value(2))
+                .andExpect(jsonPath("$.products[0].product_id").value(1))
+                .andExpect(jsonPath("$.products[0].product_name").value("テスト商品1"))
+                .andExpect(jsonPath("$.products[1].product_id").value(2))
+                .andExpect(jsonPath("$.products[1].product_name").value("テスト商品2"));
+    }
+
+    @Test
+    void 商品一覧取得_product_idsが未指定の場合バリデーションエラー() throws Exception {
+        mockMvc.perform(get("/api/v1/products"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void 商品一覧取得_100件ちょうどの場合正常() throws Exception {
+        String ids = LongStream.rangeClosed(1, 100)
+                .mapToObj(String::valueOf)
+                .collect(Collectors.joining(","));
+
+        when(productFacade.getProducts(anyList())).thenReturn(
+                ProductsResponse.builder().products(List.of()).build());
+
+        mockMvc.perform(get("/api/v1/products").param("product_ids", ids))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void 商品一覧取得_101件を超える場合バリデーションエラー() throws Exception {
+        String ids = LongStream.rangeClosed(1, 101)
+                .mapToObj(String::valueOf)
+                .collect(Collectors.joining(","));
+
+        mockMvc.perform(get("/api/v1/products").param("product_ids", ids))
+                .andExpect(status().isBadRequest());
     }
 }
