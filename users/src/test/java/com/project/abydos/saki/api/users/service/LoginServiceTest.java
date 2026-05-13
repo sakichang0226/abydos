@@ -59,7 +59,7 @@ class LoginServiceTest {
         LoginResponse response = loginService.login(request);
 
         assertThat(response.getToken()).isNotBlank();
-        assertThat(response.getUser_name()).isEqualTo("テストユーザー");
+        assertThat(response.getUserName()).isEqualTo("テストユーザー");
     }
 
     @Test

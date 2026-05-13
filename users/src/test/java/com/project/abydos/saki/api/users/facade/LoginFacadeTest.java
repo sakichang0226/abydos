@@ -33,6 +33,6 @@ class LoginFacadeTest {
         LoginResponse result = loginFacade.login(request);
 
         assertThat(result.getToken()).isEqualTo("token");
-        assertThat(result.getUser_name()).isEqualTo("テストユーザー");
+        assertThat(result.getUserName()).isEqualTo("テストユーザー");
     }
 }
