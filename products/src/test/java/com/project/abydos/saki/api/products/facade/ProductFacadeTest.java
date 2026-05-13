@@ -1,6 +1,7 @@
 package com.project.abydos.saki.api.products.facade;
 
 import com.project.abydos.saki.api.products.response.ProductResponse;
+import com.project.abydos.saki.api.products.response.ProductsResponse;
 import com.project.abydos.saki.common.exception.DataNotFoundException;
 import com.project.abydos.saki.common.service.ProductService;
 import com.project.abydos.saki.dynamodb.entity.Product;
@@ -10,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -67,5 +69,57 @@ class ProductFacadeTest {
 
         assertThatThrownBy(() -> productFacade.getProduct(999L))
                 .isInstanceOf(DataNotFoundException.class);
+    }
+
+    @Test
+    void 複数商品が存在する場合一覧レスポンスが返却される() {
+        Product product1 = new Product();
+        product1.setProductId(1L);
+        product1.setProductName("テスト商品1");
+        product1.setDescription("テスト説明1");
+        product1.setImageUrl("https://example.com/1.png");
+        product1.setShopId(10L);
+        product1.setCategoryId(5L);
+        product1.setPrice(1000L);
+        product1.setTaxType("I");
+        product1.setRating(4.0);
+        product1.setReviewCount(12L);
+        product1.setStock(50L);
+        product1.setStatus("O");
+        product1.setCreatedAt(1700000000000L);
+
+        Product product2 = new Product();
+        product2.setProductId(2L);
+        product2.setProductName("テスト商品2");
+        product2.setDescription("テスト説明2");
+        product2.setImageUrl("https://example.com/2.png");
+        product2.setShopId(20L);
+        product2.setCategoryId(10L);
+        product2.setPrice(2000L);
+        product2.setTaxType("E");
+        product2.setRating(4.5);
+        product2.setReviewCount(38L);
+        product2.setStock(120L);
+        product2.setStatus("O");
+        product2.setCreatedAt(1700000000000L);
+
+        when(productService.getProducts(List.of(1L, 2L))).thenReturn(List.of(product1, product2));
+
+        ProductsResponse response = productFacade.getProducts(List.of(1L, 2L));
+
+        assertThat(response.getProducts()).hasSize(2);
+        assertThat(response.getProducts().get(0).getProductId()).isEqualTo(1L);
+        assertThat(response.getProducts().get(0).getProductName()).isEqualTo("テスト商品1");
+        assertThat(response.getProducts().get(1).getProductId()).isEqualTo(2L);
+        assertThat(response.getProducts().get(1).getProductName()).isEqualTo("テスト商品2");
+    }
+
+    @Test
+    void 商品が0件の場合空リストが返却される() {
+        when(productService.getProducts(List.of(999L))).thenReturn(List.of());
+
+        ProductsResponse response = productFacade.getProducts(List.of(999L));
+
+        assertThat(response.getProducts()).isEmpty();
     }
 }
