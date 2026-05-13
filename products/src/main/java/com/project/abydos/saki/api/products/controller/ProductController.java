@@ -4,7 +4,6 @@ import com.project.abydos.saki.api.products.constant.ProductEndPoint;
 import com.project.abydos.saki.api.products.facade.ProductFacade;
 import com.project.abydos.saki.api.products.response.ProductResponse;
 import com.project.abydos.saki.common.constant.Endpoint;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,7 +28,7 @@ public class ProductController {
      * @return 商品詳細レスポンス
      */
     @GetMapping(ProductEndPoint.PRODUCTS + "/{product_id}")
-    public ResponseEntity<ProductResponse> getProduct(@Valid @PathVariable("product_id") Long productId) {
+    public ResponseEntity<ProductResponse> getProduct(@PathVariable("product_id") Long productId) {
         return ResponseEntity.ok(productFacade.getProduct(productId));
     }
 
