@@ -13,7 +13,7 @@ import lombok.Data;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProductResponse {
 
-    /** ロット番号 */
+    /** 商品Id */
     private Long productId;
 
     /** 商品名 */
