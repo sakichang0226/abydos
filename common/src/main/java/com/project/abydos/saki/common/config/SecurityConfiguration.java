@@ -57,6 +57,7 @@ public class SecurityConfiguration {
                                 .requestMatchers(Endpoint.ROOT).permitAll()
                                 .requestMatchers(Endpoint.HEALTH).permitAll()
                                 .requestMatchers(Endpoint.API_PREFIX + Endpoint.LOGIN).permitAll()
+                                .requestMatchers(Endpoint.API_PREFIX + Endpoint.PRODUCTS + "/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception

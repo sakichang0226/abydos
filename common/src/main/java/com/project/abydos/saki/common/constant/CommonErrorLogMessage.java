@@ -15,6 +15,8 @@ public enum CommonErrorLogMessage {
     VALIDATION_ERROR("Validation error occurred: {}"),
     /** 存在しないエンドポイントへのアクセス時 */
     ENDPOINT_NOT_FOUND("Endpoint not found: {}"),
+    /** 対象データが見つからない場合 */
+    DATA_NOT_FOUND("Data not found: {}"),
     /** 想定外の例外発生時 */
     UNEXPECTED_EXCEPTION("Unexpected exception occurred: {}"),
     /** ユーザーが見つからない場合 */
