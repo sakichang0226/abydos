@@ -34,7 +34,7 @@ public class ProductService {
      * @param productIds 複数の商品Id
      * @return 商品情報
      */
-    public List<Product> getProducts(List<Long> productIds) {
+    public List<Product> getProducts(@NonNull List<Long> productIds) {
         return productRepository.findByIds(productIds);
     }
 

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,7 +17,8 @@ import java.util.List;
 public class ProductsResponse {
 
     /** 商品リスト */
-    private List<Product> products;
+    @Builder.Default
+    private List<Product> products = new ArrayList<>();
 
     /**
      * 商品情報.

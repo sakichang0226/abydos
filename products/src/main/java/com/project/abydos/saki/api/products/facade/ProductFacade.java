@@ -8,6 +8,7 @@ import com.project.abydos.saki.dynamodb.entity.Product;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -55,6 +56,11 @@ public class ProductFacade {
      * @return 商品一覧レスポンス
      */
     public ProductsResponse getProducts(List<Long> productIds) {
+
+        if (CollectionUtils.isEmpty(productIds)) {
+            return ProductsResponse.builder().build();
+        }
+
         List<Product> products = productService.getProducts(productIds);
 
         return ProductsResponse.builder()
