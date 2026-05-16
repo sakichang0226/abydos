@@ -85,9 +85,10 @@ public class OrdersService {
                 .mapToLong(so -> so.getPrice() * so.getOrderNum())
                 .sum();
 
-        String deliveryStatus = subOrders.stream()
-                .allMatch(so -> DeliveryStatus.DELIVERED.getCode().equals(so.getDeliveryStatus()))
-                ? DeliveryStatus.DELIVERED.getCode() : DeliveryStatus.PROCESSING.getCode();
+        String deliveryStatus = subOrders.isEmpty()
+                ? DeliveryStatus.PROCESSING.getCode() : (
+                        subOrders.stream().allMatch(so -> DeliveryStatus.DELIVERED.getCode().equals(so.getDeliveryStatus()))
+                   ? DeliveryStatus.DELIVERED.getCode() : DeliveryStatus.PROCESSING.getCode());
 
         return OrdersApiResponse.OrderDetail.builder()
                 .orderId(order.getOrderId())
