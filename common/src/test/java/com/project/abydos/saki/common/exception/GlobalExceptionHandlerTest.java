@@ -19,7 +19,7 @@ class GlobalExceptionHandlerTest {
         ResponseEntity<ErrorResponse> response = handler.handleApiException(ex);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        assertThat(response.getBody().getError_code()).isEqualTo("API_ERR002");
+        assertThat(response.getBody().getErrorCode()).isEqualTo("API_ERR002");
         assertThat(response.getBody().getMessage()).isEqualTo("data not found.");
     }
 
@@ -30,7 +30,7 @@ class GlobalExceptionHandlerTest {
         ResponseEntity<ErrorResponse> response = handler.handleException(ex);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-        assertThat(response.getBody().getError_code()).isEqualTo("API_ERR999");
+        assertThat(response.getBody().getErrorCode()).isEqualTo("API_ERR999");
         assertThat(response.getBody().getMessage()).isEqualTo("server error.");
     }
 }

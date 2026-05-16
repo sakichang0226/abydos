@@ -66,6 +66,11 @@ project(':products') {
 	dependencies {
 		implementation project(':common')
 		implementation project(':dynamodb')
+		developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
+	}
+
+	bootRun {
+		workingDir = rootProject.projectDir
 	}
 
 	jar {
@@ -84,6 +89,11 @@ project(':orders') {
 	dependencies {
 		implementation project(':common')
 		implementation project(':dynamodb')
+		developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
+	}
+
+	bootRun {
+		workingDir = rootProject.projectDir
 	}
 
 	jar {
