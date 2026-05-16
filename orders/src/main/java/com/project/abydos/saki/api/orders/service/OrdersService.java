@@ -12,9 +12,11 @@ import com.project.abydos.saki.dynamodb.entity.Order;
 import com.project.abydos.saki.dynamodb.entity.OrderDetail;
 import com.project.abydos.saki.dynamodb.entity.Product;
 import com.project.abydos.saki.dynamodb.repository.*;
+import com.project.abydos.saki.dynamodb.exception.StockConditionException;
 import com.project.abydos.saki.dynamodb.param.OrderTransactionParam;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import org.springframework.util.CollectionUtils;
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
 /**
  * 注文履歴一覧API サービス.
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrdersService {
@@ -132,14 +135,19 @@ public class OrdersService {
      * @param seqUserId ユーザーID
      * @param purchaseProducts 注文商品リスト
      */
-    public void confirmed(Long seqUserId, List<OrderConfirmedRequest.Product> purchaseProducts) {
+    public void confirmed(@NonNull Long seqUserId, List<OrderConfirmedRequest.Product> purchaseProducts) {
 
-        // 3.1 productsテーブルからBatchGetItemで取得
-        List<Long> productIds = purchaseProducts.stream()
-                .map(OrderConfirmedRequest.Product::getProduct_id).toList();
+        // 3.1 同一商品の数量を集約
+        Map<Long, Long> aggregatedQuantities = purchaseProducts.stream()
+                .collect(Collectors.groupingBy(
+                        OrderConfirmedRequest.Product::getProduct_id,
+                        Collectors.summingLong(OrderConfirmedRequest.Product::getQuantity)));
+
+        // 3.2 productsテーブルから集約後のproduct_idをキーにしてBatchGetItemで取得
+        List<Long> productIds = new ArrayList<>(aggregatedQuantities.keySet());
         List<Product> products = productRepository.findByIds(productIds);
 
-        // 3.2 商品が存在しない場合
+        // 3.3 商品が存在しない場合
         if (products.size() != productIds.size()) {
             Set<Long> foundIds = products.stream().map(Product::getProductId).collect(Collectors.toSet());
             List<Long> missingIds = productIds.stream().filter(id -> !foundIds.contains(id)).toList();
@@ -149,27 +157,21 @@ public class OrdersService {
         Map<Long, Product> productMap = products.stream()
                 .collect(Collectors.toMap(Product::getProductId, p -> p));
 
-        for (OrderConfirmedRequest.Product req : purchaseProducts) {
-            Product product = productMap.get(req.getProduct_id());
+        for (Map.Entry<Long, Long> entry : aggregatedQuantities.entrySet()) {
+            Product product = productMap.get(entry.getKey());
 
-            // 3.3 商品ステータスが購入不可
+            // 3.4 商品ステータスが購入不可
             if (!ProductStatus.ON_SALE.getCode().equals(product.getStatus())) {
                 throw new ProductUnavailableException(OrderErrorLogMessage.PRODUCT_UNAVAILABLE.formatDetail(product.getProductId()));
             }
 
-            // 3.4 在庫数 < 注文数量
-            if (product.getStock() < req.getQuantity()) {
-                throw new OutOfStockException(OrderErrorLogMessage.OUT_OF_STOCK.formatDetail(product.getProductId(), product.getStock(), req.getQuantity()));
+            // 3.5 在庫数 < 集約後の注文数量
+            if (product.getStock() < entry.getValue()) {
+                throw new OutOfStockException(OrderErrorLogMessage.OUT_OF_STOCK.formatDetail(product.getProductId(), product.getStock(), entry.getValue()));
             }
         }
 
         // 4. 注文履歴テーブルの登録（TransactWriteItems）
-
-        // 同一商品の数量を集約
-        Map<Long, Long> aggregatedQuantities = purchaseProducts.stream()
-                .collect(Collectors.groupingBy(
-                        OrderConfirmedRequest.Product::getProduct_id,
-                        Collectors.summingLong(OrderConfirmedRequest.Product::getQuantity)));
 
         // 4.1 order_id採番
         Long orderId = sequenceRepository.getNextValue("order_id", 1L);
@@ -202,6 +204,10 @@ public class OrdersService {
                 .details(detailParams)
                 .build();
 
-        orderRepository.saveOrder(param);
+        try {
+            orderRepository.saveOrder(param);
+        } catch (StockConditionException ex) {
+            throw new OutOfStockException(OrderErrorLogMessage.STOCK_CONDITION_CONFLICT.getDetailFormat());
+        }
     }
 }

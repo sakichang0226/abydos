@@ -5,6 +5,11 @@ package com.project.abydos.saki.api.orders.exception;
  */
 public class ProductNotFoundException extends OrderException {
 
+    /**
+     * コンストラクタ.
+     *
+     * @param detail エラー詳細情報
+     */
     public ProductNotFoundException(String detail) {
         super(OrderErrorCode.API_ORDER_ERR001, detail);
     }

@@ -5,6 +5,11 @@ package com.project.abydos.saki.api.orders.exception;
  */
 public class OutOfStockException extends OrderException {
 
+    /**
+     * コンストラクタ.
+     *
+     * @param detail エラー詳細情報
+     */
     public OutOfStockException(String detail) {
         super(OrderErrorCode.API_ORDER_ERR003, detail);
     }

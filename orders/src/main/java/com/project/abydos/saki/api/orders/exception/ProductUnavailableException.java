@@ -5,6 +5,11 @@ package com.project.abydos.saki.api.orders.exception;
  */
 public class ProductUnavailableException extends OrderException {
 
+    /**
+     * コンストラクタ.
+     *
+     * @param detail エラー詳細情報
+     */
     public ProductUnavailableException(String detail) {
         super(OrderErrorCode.API_ORDER_ERR002, detail);
     }

@@ -14,6 +14,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice(basePackages = "com.project.abydos.saki.api.orders")
 public class OrderExceptionHandler {
 
+    /**
+     * 商品が存在しない場合の例外をハンドリングする.
+     *
+     * @param ex 商品未存在例外
+     * @return エラーレスポンス
+     */
     @ExceptionHandler(ProductNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleProductNotFoundException(ProductNotFoundException ex) {
         OrderErrorCode code = ex.getErrorCode();
@@ -24,6 +30,12 @@ public class OrderExceptionHandler {
         );
     }
 
+    /**
+     * 商品ステータスが購入不可の場合の例外をハンドリングする.
+     *
+     * @param ex 商品購入不可例外
+     * @return エラーレスポンス
+     */
     @ExceptionHandler(ProductUnavailableException.class)
     public ResponseEntity<ErrorResponse> handleProductUnavailableException(ProductUnavailableException ex) {
         OrderErrorCode code = ex.getErrorCode();
@@ -34,6 +46,12 @@ public class OrderExceptionHandler {
         );
     }
 
+    /**
+     * 在庫不足の場合の例外をハンドリングする.
+     *
+     * @param ex 在庫不足例外
+     * @return エラーレスポンス
+     */
     @ExceptionHandler(OutOfStockException.class)
     public ResponseEntity<ErrorResponse> handleOutOfStockException(OutOfStockException ex) {
         OrderErrorCode code = ex.getErrorCode();
@@ -43,4 +61,6 @@ public class OrderExceptionHandler {
                 code.getHttpStatus()
         );
     }
+
+
 }

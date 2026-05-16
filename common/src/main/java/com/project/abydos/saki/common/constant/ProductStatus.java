@@ -18,6 +18,11 @@ public enum ProductStatus {
 
     private final String code;
 
+    /**
+     * 購入可能なステータスかどうかを判定する.
+     *
+     * @return 販売中の場合true
+     */
     public boolean isAvailable() {
         return this == ON_SALE;
     }

@@ -31,6 +31,11 @@ public class OrdersFacade {
         return ordersService.getOrders(seqUserId, ordersApiRequest.getLimit(), ordersApiRequest.getLastOrderId());
     }
 
+    /**
+     * 注文確定処理を実行する.
+     *
+     * @param orderConfirmedRequest 注文確定リクエスト
+     */
     public void confirmed(@NonNull OrderConfirmedRequest orderConfirmedRequest) {
         Long seqUserId = SecurityUtils.getCurrentUserId();
         ordersService.confirmed(seqUserId, orderConfirmedRequest.getProducts());
