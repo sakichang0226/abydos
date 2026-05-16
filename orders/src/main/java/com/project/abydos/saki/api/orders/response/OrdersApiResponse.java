@@ -41,7 +41,7 @@ public class OrdersApiResponse {
         private Long total;
 
         /** 受注一覧 */
-        private List<SubOrderDetail> subOrders;
+        private List<DetailResponse> details;
 
         /** 配送ステータス */
         private String deliveryStatus;
@@ -53,10 +53,10 @@ public class OrdersApiResponse {
     @Data
     @Builder
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-    public static class SubOrderDetail {
+    public static class DetailResponse {
 
-        /** 受注ID */
-        private Long subOrderId;
+        /** 受注明細ID */
+        private Long detailId;
 
         /** 商品ID */
         private Long productId;

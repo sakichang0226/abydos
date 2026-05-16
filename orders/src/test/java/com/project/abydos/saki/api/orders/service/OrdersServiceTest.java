@@ -3,10 +3,10 @@ package com.project.abydos.saki.api.orders.service;
 import com.project.abydos.saki.api.orders.constant.DeliveryStatus;
 import com.project.abydos.saki.api.orders.response.OrdersApiResponse;
 import com.project.abydos.saki.dynamodb.entity.Order;
-import com.project.abydos.saki.dynamodb.entity.SubOrder;
+import com.project.abydos.saki.dynamodb.entity.OrderDetail;
 import com.project.abydos.saki.dynamodb.repository.OrderRepository;
 import com.project.abydos.saki.dynamodb.repository.PagedResult;
-import com.project.abydos.saki.dynamodb.repository.SubOrderRepository;
+import com.project.abydos.saki.dynamodb.repository.OrderDetailRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,7 +26,7 @@ class OrdersServiceTest {
     private OrderRepository orderRepository;
 
     @Mock
-    private SubOrderRepository subOrderRepository;
+    private OrderDetailRepository orderDetailRepository;
 
     @InjectMocks
     private OrdersService ordersService;
@@ -40,45 +40,45 @@ class OrdersServiceTest {
 
         assertThat(response.getOrders()).isEmpty();
         assertThat(response.getLastOrderId()).isNull();
-        verify(subOrderRepository, never()).batchGetByOrderSubOrderIds(any());
+        verify(orderDetailRepository, never()).batchGetByOrderDetailIds(any());
     }
 
     @Test
-    void 注文履歴が存在する場合にsub_ordersを含むレスポンスが返却される() {
+    void 注文履歴が存在する場合にorder_detailsを含むレスポンスが返却される() {
         Order order = createOrder(1L, 1001L, 1700000100000L, Set.of(1L, 2L));
 
-        SubOrder subOrder1 = createSubOrder(1001L, 1L, 10001L, 1L, "商品A", 2480L, 2L, "ED");
-        SubOrder subOrder2 = createSubOrder(1001L, 2L, 10002L, 2L, "商品B", 8980L, 1L, "ED");
+        OrderDetail detail1 = createOrderDetail(1001L, 1L, 10001L, 1L, "商品A", 2480L, 2L, "ED");
+        OrderDetail detail2 = createOrderDetail(1001L, 2L, 10002L, 2L, "商品B", 8980L, 1L, "ED");
 
         when(orderRepository.findByUserId(1L, 10, null))
                 .thenReturn(new PagedResult<>(List.of(order), null));
-        when(subOrderRepository.batchGetByOrderSubOrderIds(any()))
-                .thenReturn(List.of(subOrder1, subOrder2));
+        when(orderDetailRepository.batchGetByOrderDetailIds(any()))
+                .thenReturn(List.of(detail1, detail2));
 
         OrdersApiResponse response = ordersService.getOrders(1L, 10, null);
 
         assertThat(response.getOrders()).hasSize(1);
         assertThat(response.getLastOrderId()).isNull();
 
-        OrdersApiResponse.OrderDetail detail = response.getOrders().get(0);
-        assertThat(detail.getOrderId()).isEqualTo(1001L);
-        assertThat(detail.getCreatedAt()).isEqualTo(1700000100000L);
-        assertThat(detail.getTotal()).isEqualTo(2480L * 2 + 8980L * 1);
-        assertThat(detail.getDeliveryStatus()).isEqualTo(DeliveryStatus.DELIVERED.getCode());
-        assertThat(detail.getSubOrders()).hasSize(2);
+        OrdersApiResponse.OrderDetail orderDetail = response.getOrders().get(0);
+        assertThat(orderDetail.getOrderId()).isEqualTo(1001L);
+        assertThat(orderDetail.getCreatedAt()).isEqualTo(1700000100000L);
+        assertThat(orderDetail.getTotal()).isEqualTo(2480L * 2 + 8980L * 1);
+        assertThat(orderDetail.getDeliveryStatus()).isEqualTo(DeliveryStatus.DELIVERED.getCode());
+        assertThat(orderDetail.getDetails()).hasSize(2);
     }
 
     @Test
-    void 一部のsub_orderが未配送の場合にdelivery_statusがPRになる() {
+    void 一部のorder_detailが未配送の場合にdelivery_statusがPRになる() {
         Order order = createOrder(1L, 1001L, 1700000100000L, Set.of(1L, 2L));
 
-        SubOrder subOrder1 = createSubOrder(1001L, 1L, 10001L, 1L, "商品A", 2480L, 1L, "ED");
-        SubOrder subOrder2 = createSubOrder(1001L, 2L, 10002L, 2L, "商品B", 8980L, 1L, "PR");
+        OrderDetail detail1 = createOrderDetail(1001L, 1L, 10001L, 1L, "商品A", 2480L, 1L, "ED");
+        OrderDetail detail2 = createOrderDetail(1001L, 2L, 10002L, 2L, "商品B", 8980L, 1L, "PR");
 
         when(orderRepository.findByUserId(1L, 10, null))
                 .thenReturn(new PagedResult<>(List.of(order), null));
-        when(subOrderRepository.batchGetByOrderSubOrderIds(any()))
-                .thenReturn(List.of(subOrder1, subOrder2));
+        when(orderDetailRepository.batchGetByOrderDetailIds(any()))
+                .thenReturn(List.of(detail1, detail2));
 
         OrdersApiResponse response = ordersService.getOrders(1L, 10, null);
 
@@ -89,12 +89,12 @@ class OrdersServiceTest {
     @Test
     void lastEvaluatedSortKeyが存在する場合にlastOrderIdが返却される() {
         Order order = createOrder(1L, 1001L, 1700000100000L, Set.of(1L));
-        SubOrder subOrder = createSubOrder(1001L, 1L, 10001L, 1L, "商品A", 1000L, 1L, "ED");
+        OrderDetail detail = createOrderDetail(1001L, 1L, 10001L, 1L, "商品A", 1000L, 1L, "ED");
 
         when(orderRepository.findByUserId(1L, 1, null))
                 .thenReturn(new PagedResult<>(List.of(order), 1001L));
-        when(subOrderRepository.batchGetByOrderSubOrderIds(any()))
-                .thenReturn(List.of(subOrder));
+        when(orderDetailRepository.batchGetByOrderDetailIds(any()))
+                .thenReturn(List.of(detail));
 
         OrdersApiResponse response = ordersService.getOrders(1L, 1, null);
 
@@ -102,7 +102,7 @@ class OrdersServiceTest {
     }
 
     @Test
-    void sub_order_idsがnullのorderはBatchGet対象外になる() {
+    void detail_idsがnullのorderはBatchGet対象外になる() {
         Order order = createOrder(1L, 1001L, 1700000100000L, null);
 
         when(orderRepository.findByUserId(1L, 10, null))
@@ -110,50 +110,50 @@ class OrdersServiceTest {
 
         OrdersApiResponse response = ordersService.getOrders(1L, 10, null);
 
-        verify(subOrderRepository, never()).batchGetByOrderSubOrderIds(any());
+        verify(orderDetailRepository, never()).batchGetByOrderDetailIds(any());
         assertThat(response.getOrders()).hasSize(1);
         assertThat(response.getOrders().get(0).getTotal()).isEqualTo(0L);
     }
 
     @Test
-    void sub_orderのtotalがprice_orderNumで計算される() {
+    void order_detailのtotalがprice_orderNumで計算される() {
         Order order = createOrder(1L, 1001L, 1700000100000L, Set.of(1L));
-        SubOrder subOrder = createSubOrder(1001L, 1L, 10001L, 1L, "商品A", 1500L, 3L, "ED");
+        OrderDetail detail = createOrderDetail(1001L, 1L, 10001L, 1L, "商品A", 1500L, 3L, "ED");
 
         when(orderRepository.findByUserId(1L, 10, null))
                 .thenReturn(new PagedResult<>(List.of(order), null));
-        when(subOrderRepository.batchGetByOrderSubOrderIds(any()))
-                .thenReturn(List.of(subOrder));
+        when(orderDetailRepository.batchGetByOrderDetailIds(any()))
+                .thenReturn(List.of(detail));
 
         OrdersApiResponse response = ordersService.getOrders(1L, 10, null);
 
-        OrdersApiResponse.SubOrderDetail subOrderDetail = response.getOrders().get(0).getSubOrders().get(0);
-        assertThat(subOrderDetail.getTotal()).isEqualTo(4500L);
-        assertThat(subOrderDetail.getPrice()).isEqualTo(1500L);
-        assertThat(subOrderDetail.getOrderNum()).isEqualTo(3L);
+        OrdersApiResponse.DetailResponse detailResponse = response.getOrders().get(0).getDetails().get(0);
+        assertThat(detailResponse.getTotal()).isEqualTo(4500L);
+        assertThat(detailResponse.getPrice()).isEqualTo(1500L);
+        assertThat(detailResponse.getOrderNum()).isEqualTo(3L);
     }
 
-    private Order createOrder(Long userId, Long orderId, Long createdAt, Set<Long> subOrderIds) {
+    private Order createOrder(Long userId, Long orderId, Long createdAt, Set<Long> detailIds) {
         Order order = new Order();
         order.setUserId(userId);
         order.setOrderId(orderId);
         order.setCreatedAt(createdAt);
-        order.setSubOrderIds(subOrderIds);
+        order.setDetailIds(detailIds);
         return order;
     }
 
-    private SubOrder createSubOrder(Long orderId, Long subOrderId, Long shopId,
-                                    Long productId, String productName, Long price,
-                                    Long orderNum, String deliveryStatus) {
-        SubOrder subOrder = new SubOrder();
-        subOrder.setOrderId(orderId);
-        subOrder.setSubOrderId(subOrderId);
-        subOrder.setShopId(shopId);
-        subOrder.setProductId(productId);
-        subOrder.setProductName(productName);
-        subOrder.setPrice(price);
-        subOrder.setOrderNum(orderNum);
-        subOrder.setDeliveryStatus(deliveryStatus);
-        return subOrder;
+    private OrderDetail createOrderDetail(Long orderId, Long detailId, Long shopId,
+                                          Long productId, String productName, Long price,
+                                          Long orderNum, String deliveryStatus) {
+        OrderDetail detail = new OrderDetail();
+        detail.setOrderId(orderId);
+        detail.setDetailId(detailId);
+        detail.setShopId(shopId);
+        detail.setProductId(productId);
+        detail.setProductName(productName);
+        detail.setPrice(price);
+        detail.setOrderNum(orderNum);
+        detail.setDeliveryStatus(deliveryStatus);
+        return detail;
     }
 }

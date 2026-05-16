@@ -3,10 +3,10 @@ package com.project.abydos.saki.api.orders.service;
 import com.project.abydos.saki.api.orders.response.OrdersApiResponse;
 import com.project.abydos.saki.api.orders.constant.DeliveryStatus;
 import com.project.abydos.saki.dynamodb.entity.Order;
-import com.project.abydos.saki.dynamodb.entity.SubOrder;
+import com.project.abydos.saki.dynamodb.entity.OrderDetail;
 import com.project.abydos.saki.dynamodb.repository.OrderRepository;
 import com.project.abydos.saki.dynamodb.repository.PagedResult;
-import com.project.abydos.saki.dynamodb.repository.SubOrderRepository;
+import com.project.abydos.saki.dynamodb.repository.OrderDetailRepository;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,11 +24,11 @@ import java.util.stream.Collectors;
 public class OrdersService {
 
     private final OrderRepository orderRepository;
-    private final SubOrderRepository subOrderRepository;
+    private final OrderDetailRepository orderDetailRepository;
 
     /**
      * 注文履歴一覧を取得する.
-     * ordersテーブルからQueryで取得後、sub_order_idsを展開してsub_ordersテーブルからBatchGetItemで一括取得する.
+     * ordersテーブルからQueryで取得後、detail_idsを展開してorder_detailsテーブルからBatchGetItemで一括取得する.
      *
      * @param seqUserId ユーザーID
      * @param limit 取得件数
@@ -45,22 +45,22 @@ public class OrdersService {
 
         List<Order> orders = result.getItems();
 
-        // sub_order_idsを展開し、BatchGetItemで一括取得
-        Map<Long, Set<Long>> orderSubOrderIdsMap = orders.stream()
-                .filter(o -> !CollectionUtils.isEmpty(o.getSubOrderIds()))
-                .collect(Collectors.toMap(Order::getOrderId, Order::getSubOrderIds));
+        // detail_idsを展開し、BatchGetItemで一括取得
+        Map<Long, Set<Long>> orderDetailIdsMap = orders.stream()
+                .filter(o -> !CollectionUtils.isEmpty(o.getDetailIds()))
+                .collect(Collectors.toMap(Order::getOrderId, Order::getDetailIds));
 
-        Map<Long, List<SubOrder>> subOrdersByOrderId = Collections.emptyMap();
-        if (!orderSubOrderIdsMap.isEmpty()) {
-            List<SubOrder> subOrders = subOrderRepository.batchGetByOrderSubOrderIds(orderSubOrderIdsMap);
-            subOrdersByOrderId = subOrders.stream()
-                    .collect(Collectors.groupingBy(SubOrder::getOrderId));
+        Map<Long, List<OrderDetail>> detailsByOrderId = Collections.emptyMap();
+        if (!orderDetailIdsMap.isEmpty()) {
+            List<OrderDetail> details = orderDetailRepository.batchGetByOrderDetailIds(orderDetailIdsMap);
+            detailsByOrderId = details.stream()
+                    .collect(Collectors.groupingBy(OrderDetail::getOrderId));
         }
 
         // レスポンスマッピング
-        Map<Long, List<SubOrder>> finalSubOrdersByOrderId = subOrdersByOrderId;
+        Map<Long, List<OrderDetail>> finalDetailsByOrderId = detailsByOrderId;
         List<OrdersApiResponse.OrderDetail> orderDetails = orders.stream()
-                .map(order -> mapToOrderDetail(order, finalSubOrdersByOrderId.getOrDefault(order.getOrderId(), Collections.emptyList())))
+                .map(order -> mapToOrderDetail(order, finalDetailsByOrderId.getOrDefault(order.getOrderId(), Collections.emptyList())))
                 .toList();
 
         return OrdersApiResponse.builder()
@@ -70,50 +70,50 @@ public class OrdersService {
     }
 
     /**
-     * Orderと対応するSubOrderリストから注文詳細レスポンスを生成する.
+     * Orderと対応するOrderDetailリストから注文詳細レスポンスを生成する.
      *
      * @param order 注文エンティティ
-     * @param subOrders 受注明細エンティティリスト
+     * @param details 受注明細エンティティリスト
      * @return 注文詳細レスポンス
      */
-    private OrdersApiResponse.OrderDetail mapToOrderDetail(Order order, List<SubOrder> subOrders) {
-        List<OrdersApiResponse.SubOrderDetail> subOrderDetails = subOrders.stream()
-                .map(this::mapToSubOrderDetail)
+    private OrdersApiResponse.OrderDetail mapToOrderDetail(Order order, List<OrderDetail> details) {
+        List<OrdersApiResponse.DetailResponse> detailResponses = details.stream()
+                .map(this::mapToDetailResponse)
                 .toList();
 
-        long total = subOrders.stream()
-                .mapToLong(so -> so.getPrice() * so.getOrderNum())
+        long total = details.stream()
+                .mapToLong(d -> d.getPrice() * d.getOrderNum())
                 .sum();
 
-        String deliveryStatus = subOrders.isEmpty()
+        String deliveryStatus = details.isEmpty()
                 ? DeliveryStatus.PROCESSING.getCode() : (
-                        subOrders.stream().allMatch(so -> DeliveryStatus.DELIVERED.getCode().equals(so.getDeliveryStatus()))
+                        details.stream().allMatch(d -> DeliveryStatus.DELIVERED.getCode().equals(d.getDeliveryStatus()))
                    ? DeliveryStatus.DELIVERED.getCode() : DeliveryStatus.PROCESSING.getCode());
 
         return OrdersApiResponse.OrderDetail.builder()
                 .orderId(order.getOrderId())
                 .createdAt(order.getCreatedAt())
                 .total(total)
-                .subOrders(subOrderDetails)
+                .details(detailResponses)
                 .deliveryStatus(deliveryStatus)
                 .build();
     }
 
     /**
-     * SubOrderエンティティから受注詳細レスポンスを生成する.
+     * OrderDetailエンティティから受注詳細レスポンスを生成する.
      *
-     * @param subOrder 受注明細エンティティ
+     * @param detail 受注明細エンティティ
      * @return 受注詳細レスポンス
      */
-    private OrdersApiResponse.SubOrderDetail mapToSubOrderDetail(SubOrder subOrder) {
-        return OrdersApiResponse.SubOrderDetail.builder()
-                .subOrderId(subOrder.getSubOrderId())
-                .productId(subOrder.getProductId())
-                .productName(subOrder.getProductName())
-                .shopId(subOrder.getShopId())
-                .price(subOrder.getPrice())
-                .orderNum(subOrder.getOrderNum())
-                .total(subOrder.getPrice() * subOrder.getOrderNum())
+    private OrdersApiResponse.DetailResponse mapToDetailResponse(OrderDetail detail) {
+        return OrdersApiResponse.DetailResponse.builder()
+                .detailId(detail.getDetailId())
+                .productId(detail.getProductId())
+                .productName(detail.getProductName())
+                .shopId(detail.getShopId())
+                .price(detail.getPrice())
+                .orderNum(detail.getOrderNum())
+                .total(detail.getPrice() * detail.getOrderNum())
                 .build();
     }
 }

@@ -49,9 +49,9 @@ class OrdersControllerTest {
                                 .createdAt(1700000100000L)
                                 .total(13940L)
                                 .deliveryStatus("ED")
-                                .subOrders(List.of(
-                                        OrdersApiResponse.SubOrderDetail.builder()
-                                                .subOrderId(1L)
+                                .details(List.of(
+                                        OrdersApiResponse.DetailResponse.builder()
+                                                .detailId(1L)
                                                 .productId(1L)
                                                 .productName("プレミアムコットンTシャツ")
                                                 .shopId(10001L)
@@ -59,8 +59,8 @@ class OrdersControllerTest {
                                                 .orderNum(2L)
                                                 .total(4960L)
                                                 .build(),
-                                        OrdersApiResponse.SubOrderDetail.builder()
-                                                .subOrderId(2L)
+                                        OrdersApiResponse.DetailResponse.builder()
+                                                .detailId(2L)
                                                 .productId(2L)
                                                 .productName("ワイヤレスイヤホン Pro")
                                                 .shopId(10002L)
@@ -82,14 +82,14 @@ class OrdersControllerTest {
                 .andExpect(jsonPath("$.orders[0].created_at").value(1700000100000L))
                 .andExpect(jsonPath("$.orders[0].total").value(13940))
                 .andExpect(jsonPath("$.orders[0].delivery_status").value("ED"))
-                .andExpect(jsonPath("$.orders[0].sub_orders.length()").value(2))
-                .andExpect(jsonPath("$.orders[0].sub_orders[0].sub_order_id").value(1))
-                .andExpect(jsonPath("$.orders[0].sub_orders[0].product_name").value("プレミアムコットンTシャツ"))
-                .andExpect(jsonPath("$.orders[0].sub_orders[0].price").value(2480))
-                .andExpect(jsonPath("$.orders[0].sub_orders[0].order_num").value(2))
-                .andExpect(jsonPath("$.orders[0].sub_orders[0].total").value(4960))
-                .andExpect(jsonPath("$.orders[0].sub_orders[1].sub_order_id").value(2))
-                .andExpect(jsonPath("$.orders[0].sub_orders[1].product_name").value("ワイヤレスイヤホン Pro"));
+                .andExpect(jsonPath("$.orders[0].details.length()").value(2))
+                .andExpect(jsonPath("$.orders[0].details[0].detail_id").value(1))
+                .andExpect(jsonPath("$.orders[0].details[0].product_name").value("プレミアムコットンTシャツ"))
+                .andExpect(jsonPath("$.orders[0].details[0].price").value(2480))
+                .andExpect(jsonPath("$.orders[0].details[0].order_num").value(2))
+                .andExpect(jsonPath("$.orders[0].details[0].total").value(4960))
+                .andExpect(jsonPath("$.orders[0].details[1].detail_id").value(2))
+                .andExpect(jsonPath("$.orders[0].details[1].product_name").value("ワイヤレスイヤホン Pro"));
     }
 
     @Test
@@ -115,9 +115,9 @@ class OrdersControllerTest {
                                 .createdAt(1700000200000L)
                                 .total(2480L)
                                 .deliveryStatus("PR")
-                                .subOrders(List.of(
-                                        OrdersApiResponse.SubOrderDetail.builder()
-                                                .subOrderId(4L)
+                                .details(List.of(
+                                        OrdersApiResponse.DetailResponse.builder()
+                                                .detailId(4L)
                                                 .productId(1L)
                                                 .productName("プレミアムコットンTシャツ")
                                                 .shopId(10001L)
