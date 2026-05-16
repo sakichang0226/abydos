@@ -1,6 +1,7 @@
 package com.project.abydos.saki.api.orders.controller;
 
 import com.project.abydos.saki.api.orders.facade.OrdersFacade;
+import com.project.abydos.saki.api.orders.request.OrderConfirmedRequest;
 import com.project.abydos.saki.api.orders.request.OrdersApiRequest;
 import com.project.abydos.saki.api.orders.response.OrdersApiResponse;
 import com.project.abydos.saki.common.constant.Endpoint;
@@ -8,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,6 +32,14 @@ public class OrdersController {
     @GetMapping(Endpoint.ORDERS)
     public ResponseEntity<OrdersApiResponse> getOrders(@Valid OrdersApiRequest ordersApiRequest) {
         return ResponseEntity.ok(ordersFacade.getOrders(ordersApiRequest));
+    }
+
+    @PostMapping(Endpoint.ORDERS)
+    public ResponseEntity<Void> postOrders(@Valid OrderConfirmedRequest orderConfirmedRequest) {
+
+        ordersFacade.confirmed(orderConfirmedRequest);
+
+        return ResponseEntity.ok().build();
     }
 
 }
