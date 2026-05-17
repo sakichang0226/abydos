@@ -17,10 +17,15 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.abydos.saki.api.orders.request.OrderConfirmedRequest;
+import org.springframework.http.MediaType;
 
 @ExtendWith(SpringExtension.class)
 class OrdersControllerTest {
@@ -177,5 +182,111 @@ class OrdersControllerTest {
                         .param("lastOrderId", "1001"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.orders").isEmpty());
+    }
+
+    @Test
+    void 注文確定_正常系() throws Exception {
+        doNothing().when(ordersFacade).confirmed(any(OrderConfirmedRequest.class));
+
+        OrderConfirmedRequest request = new OrderConfirmedRequest();
+        OrderConfirmedRequest.Product product = new OrderConfirmedRequest.Product();
+        product.setProduct_id(1L);
+        product.setQuantity(2L);
+        request.setProducts(List.of(product));
+
+        mockMvc.perform(post("/api/v1/orders")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(request)))
+                .andExpect(status().isOk());
+
+        verify(ordersFacade).confirmed(any(OrderConfirmedRequest.class));
+    }
+
+    @Test
+    void 注文確定_商品リストが空の場合バリデーションエラー() throws Exception {
+        OrderConfirmedRequest request = new OrderConfirmedRequest();
+        request.setProducts(Collections.emptyList());
+
+        mockMvc.perform(post("/api/v1/orders")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void 注文確定_数量が0の場合バリデーションエラー() throws Exception {
+        OrderConfirmedRequest request = new OrderConfirmedRequest();
+        OrderConfirmedRequest.Product product = new OrderConfirmedRequest.Product();
+        product.setProduct_id(1L);
+        product.setQuantity(0L);
+        request.setProducts(List.of(product));
+
+        mockMvc.perform(post("/api/v1/orders")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void 注文確定_数量が負数の場合バリデーションエラー() throws Exception {
+        OrderConfirmedRequest request = new OrderConfirmedRequest();
+        OrderConfirmedRequest.Product product = new OrderConfirmedRequest.Product();
+        product.setProduct_id(1L);
+        product.setQuantity(-1L);
+        request.setProducts(List.of(product));
+
+        mockMvc.perform(post("/api/v1/orders")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void 注文確定_productsがnullの場合バリデーションエラー() throws Exception {
+        String json = "{}";
+
+        mockMvc.perform(post("/api/v1/orders")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void 注文確定_product_idがnullの場合バリデーションエラー() throws Exception {
+        String json = "{\"products\":[{\"quantity\":2}]}";
+
+        mockMvc.perform(post("/api/v1/orders")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void 注文確定_quantityがnullの場合バリデーションエラー() throws Exception {
+        String json = "{\"products\":[{\"product_id\":1}]}";
+
+        mockMvc.perform(post("/api/v1/orders")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void 注文確定_商品リストが101件の場合バリデーションエラー() throws Exception {
+        List<OrderConfirmedRequest.Product> products = java.util.stream.IntStream.rangeClosed(1, 101)
+                .mapToObj(i -> {
+                    OrderConfirmedRequest.Product p = new OrderConfirmedRequest.Product();
+                    p.setProduct_id((long) i);
+                    p.setQuantity(1L);
+                    return p;
+                }).toList();
+
+        OrderConfirmedRequest request = new OrderConfirmedRequest();
+        request.setProducts(products);
+
+        mockMvc.perform(post("/api/v1/orders")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
     }
 }
