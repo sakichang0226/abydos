@@ -1,4 +1,4 @@
-FROM openjdk:17-jdk-alpine
+FROM amazoncorretto:17-alpine
 WORKDIR /app
 COPY build/libs/users.jar users.jar
 EXPOSE 8080
