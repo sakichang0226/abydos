@@ -5,12 +5,9 @@ import com.project.abydos.saki.api.orders.request.OrderConfirmedRequest;
 import com.project.abydos.saki.api.orders.request.OrdersApiRequest;
 import com.project.abydos.saki.api.orders.response.OrdersApiResponse;
 import com.project.abydos.saki.common.constant.Endpoint;
-import com.project.abydos.saki.common.constant.ErrorCode;
-import com.project.abydos.saki.common.exception.ApiException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -41,11 +38,7 @@ public class OrdersController {
      * @return 成功時は200 OK
      */
     @PostMapping(Endpoint.ORDERS)
-    public ResponseEntity<Void> postOrders(@Valid @RequestBody OrderConfirmedRequest orderConfirmedRequest, BindingResult bindingResult) {
-
-        if (bindingResult.hasErrors()) {
-            throw new ApiException(ErrorCode.API_ERR001);
-        }
+    public ResponseEntity<Void> postOrders(@Valid @RequestBody OrderConfirmedRequest orderConfirmedRequest) {
 
         ordersFacade.confirmed(orderConfirmedRequest);
 
