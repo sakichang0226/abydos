@@ -14,6 +14,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfigurationSource;
+
+import java.util.Optional;
 
 /**
  * Spring Security設定クラス.
@@ -28,6 +31,8 @@ public class SecurityConfiguration {
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     private final CustomUserDetailService customUserDetailService;
+
+    private final Optional<CorsConfigurationSource> corsConfigurationSource;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -45,9 +50,9 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain applicationSecurity(HttpSecurity http) throws Exception {
 
-        http.addFilterBefore(jwtAuthenticationFilter, org.springframework.web.filter.CorsFilter.class);
-
-        http.cors(AbstractHttpConfigurer::disable)
+        http.cors(cors -> corsConfigurationSource
+                        .ifPresentOrElse(cors::configurationSource, cors::disable))
+                .addFilterBefore(jwtAuthenticationFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(AbstractHttpConfigurer::disable)
@@ -57,6 +62,7 @@ public class SecurityConfiguration {
                                 .requestMatchers(Endpoint.ROOT).permitAll()
                                 .requestMatchers(Endpoint.HEALTH).permitAll()
                                 .requestMatchers(Endpoint.API_PREFIX + Endpoint.LOGIN).permitAll()
+                                .requestMatchers(Endpoint.API_PREFIX + "/me").permitAll()
                                 .requestMatchers(Endpoint.API_PREFIX + Endpoint.PRODUCTS + "/**").permitAll()
                                 .anyRequest().authenticated()
                 )

@@ -4,6 +4,7 @@ import com.project.abydos.saki.api.users.request.LoginRequest;
 import com.project.abydos.saki.api.users.response.LoginResponse;
 import com.project.abydos.saki.api.users.facade.LoginFacade;
 import com.project.abydos.saki.api.users.constant.UsersEndpoint;
+import com.project.abydos.saki.common.config.CookieProperties;
 import com.project.abydos.saki.common.constant.Endpoint;
 import com.project.abydos.saki.common.constant.SecurityConstant;
 import jakarta.validation.Valid;
@@ -27,6 +28,8 @@ public class LoginController {
 
     private final LoginFacade loginFacade;
 
+    private final CookieProperties cookieProperties;
+
     /**
      * ログイン処理を実行する.
      *
@@ -39,8 +42,8 @@ public class LoginController {
 
         ResponseCookie cookie = ResponseCookie.from(SecurityConstant.TOKEN_COOKIE_NAME, response.getToken())
                 .httpOnly(true)
-                .secure(true)
-                .sameSite("Strict")
+                .secure(cookieProperties.isSecure())
+                .sameSite(cookieProperties.getSameSite())
                 .path("/")
                 .maxAge(SecurityConstant.TOKEN_EXPIRATION_HOURS * 3600)
                 .build();
