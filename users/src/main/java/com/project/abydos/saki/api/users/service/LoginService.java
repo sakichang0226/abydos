@@ -54,6 +54,7 @@ public class LoginService {
                 .withSubject(user.getUserId().toString())
                 .withClaim(SecurityConstant.CLAIM_USER_ID, user.getUserId())
                 .withClaim(SecurityConstant.CLAIM_EMAIL, user.getEmail())
+                .withClaim(SecurityConstant.CLAIM_USER_NAME, user.getUserName())
                 .withExpiresAt(Instant.now().plus(SecurityConstant.TOKEN_EXPIRATION_HOURS, ChronoUnit.HOURS))
                 .sign(Algorithm.HMAC256(jwtProperties.getSecret()));
 

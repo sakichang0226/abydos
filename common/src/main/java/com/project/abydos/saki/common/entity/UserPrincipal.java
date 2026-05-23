@@ -19,6 +19,9 @@ public class UserPrincipal implements UserDetails {
     /** ユーザーID */
     private final Long userId;
 
+    /** ユーザー名 */
+    private final String userName;
+
     /** メールアドレス */
     private final String email;
 
@@ -42,6 +45,10 @@ public class UserPrincipal implements UserDetails {
     @Override
     public String getUsername() {
         return email;
+    }
+
+    public String getUserName() {
+        return userName;
     }
 
     @Override

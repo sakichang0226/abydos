@@ -23,8 +23,14 @@ public class SecurityConstant {
     /** JWT claim: ユーザーID */
     public static final String CLAIM_USER_ID = "user_id";
 
+    /** JWT claim: ユーザー名 */
+    public static final String CLAIM_USER_NAME = "n";
+
     /** JWTの有効期限（時間） */
     public static final long TOKEN_EXPIRATION_HOURS = 1;
+
+    /** Cookie名: トークン */
+    public static final String TOKEN_COOKIE_NAME = "token";
 
     private SecurityConstant() {}
 }
