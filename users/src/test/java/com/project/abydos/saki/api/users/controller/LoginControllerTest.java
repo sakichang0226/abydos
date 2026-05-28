@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -44,7 +45,7 @@ class LoginControllerTest {
     }
 
     @Test
-    void ログイン成功時にトークンとユーザー名が返却される() throws Exception {
+    void ログイン成功時にCookieにトークンが設定されユーザー名が返却される() throws Exception {
         LoginResponse response = new LoginResponse("test-token", "テストユーザー");
         when(loginFacade.login(any(LoginRequest.class))).thenReturn(response);
 
@@ -56,7 +57,12 @@ class LoginControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").value("test-token"))
+                .andExpect(cookie().value("token", "test-token"))
+                .andExpect(cookie().httpOnly("token", true))
+                .andExpect(cookie().secure("token", true))
+                .andExpect(cookie().path("token", "/"))
+                .andExpect(cookie().maxAge("token", 3600))
+                .andExpect(jsonPath("$.token").doesNotExist())
                 .andExpect(jsonPath("$.user_name").value("テストユーザー"));
     }
 

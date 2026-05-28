@@ -27,6 +27,7 @@ public class JwtToPrincipalConverter {
     public static UserPrincipal convert(@NonNull DecodedJWT jwt) {
         return UserPrincipal.builder()
                 .userId(Long.valueOf(jwt.getSubject()))
+                .userName(jwt.getClaim(SecurityConstant.CLAIM_USER_NAME).asString())
                 .email(jwt.getClaim(SecurityConstant.CLAIM_EMAIL).asString())
                 .authorities(extractAuthorities(jwt))
                 .build();
