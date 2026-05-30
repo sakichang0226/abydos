@@ -3,4 +3,4 @@ security:
     secret: local-dev-secret-key-for-testing-only
   cookie:
     secure: false
-    same-site: None
+    same-site: Lax

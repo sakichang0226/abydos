@@ -15,16 +15,13 @@ public class SecurityConstant {
     public static final int BEARER_PREFIX_LENGTH = BEARER_PREFIX.length();
 
     /** JWT claim: メールアドレス */
-    public static final String CLAIM_EMAIL = "e";
+    public static final String CLAIM_EMAIL = "email";
 
     /** JWT claim: 権限 */
     public static final String CLAIM_AUTHORITIES = "a";
 
-    /** JWT claim: ユーザーID */
-    public static final String CLAIM_USER_ID = "user_id";
-
     /** JWT claim: ユーザー名 */
-    public static final String CLAIM_USER_NAME = "n";
+    public static final String CLAIM_USER_NAME = "name";
 
     /** JWTの有効期限（時間） */
     public static final long TOKEN_EXPIRATION_HOURS = 1;
