@@ -7,7 +7,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * 商品サービス.
@@ -35,7 +38,15 @@ public class ProductService {
      * @return 商品情報
      */
     public List<Product> getProducts(@NonNull List<Long> productIds) {
-        return productRepository.findByIds(productIds);
+        List<Product> products = productRepository.findByIds(productIds);
+
+        Map<Long, Product> productMap = products.stream()
+                .collect(Collectors.toMap(Product::getProductId, p -> p));
+
+        return productIds.stream()
+                .map(productMap::get)
+                .filter(Objects::nonNull)
+                .toList();
     }
 
 }
