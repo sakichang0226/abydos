@@ -133,6 +133,29 @@ class OrdersServiceTest {
     }
 
     @Test
+    void order_detailsがdetailIdの昇順でソートされて返却される() {
+        Order order = createOrder(1L, 1001L, 1700000100000L, Set.of(1L, 2L, 3L));
+
+        // detailIdが逆順で返却されるケース
+        OrderDetail detail1 = createOrderDetail(1001L, 3L, 10001L, 1L, "商品C", 500L, 1L, "ED");
+        OrderDetail detail2 = createOrderDetail(1001L, 1L, 10002L, 2L, "商品A", 1000L, 1L, "ED");
+        OrderDetail detail3 = createOrderDetail(1001L, 2L, 10003L, 3L, "商品B", 2000L, 1L, "ED");
+
+        when(orderRepository.findByUserId(1L, 10, null))
+                .thenReturn(new PagedResult<>(List.of(order), null));
+        when(orderDetailRepository.batchGetByOrderDetailIds(any()))
+                .thenReturn(List.of(detail1, detail2, detail3));
+
+        OrdersApiResponse response = ordersService.getOrders(1L, 10, null);
+
+        List<OrdersApiResponse.DetailResponse> details = response.getOrders().get(0).getDetails();
+        assertThat(details).hasSize(3);
+        assertThat(details.get(0).getDetailId()).isEqualTo(1L);
+        assertThat(details.get(1).getDetailId()).isEqualTo(2L);
+        assertThat(details.get(2).getDetailId()).isEqualTo(3L);
+    }
+
+    @Test
     void order_detailのtotalがprice_orderNumで計算される() {
         Order order = createOrder(1L, 1001L, 1700000100000L, Set.of(1L));
         OrderDetail detail = createOrderDetail(1001L, 1L, 10001L, 1L, "商品A", 1500L, 3L, "ED");
