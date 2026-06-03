@@ -64,7 +64,9 @@ public class OrdersService {
         Map<Long, List<OrderDetail>> detailsByOrderId = Collections.emptyMap();
         if (!orderDetailIdsMap.isEmpty()) {
             List<OrderDetail> details = orderDetailRepository.batchGetByOrderDetailIds(orderDetailIdsMap);
+
             detailsByOrderId = details.stream()
+                    .sorted(Comparator.comparing(OrderDetail::getDetailId))
                     .collect(Collectors.groupingBy(OrderDetail::getOrderId));
         }
 
