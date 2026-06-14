@@ -272,8 +272,8 @@ class OrdersControllerTest {
     }
 
     @Test
-    void 注文確定_商品リストが101件の場合バリデーションエラー() throws Exception {
-        List<OrderConfirmedRequest.Product> products = java.util.stream.IntStream.rangeClosed(1, 101)
+    void 注文確定_商品リストが21件の場合バリデーションエラー() throws Exception {
+        List<OrderConfirmedRequest.Product> products = java.util.stream.IntStream.rangeClosed(1, 21)
                 .mapToObj(i -> {
                     OrderConfirmedRequest.Product p = new OrderConfirmedRequest.Product();
                     p.setProduct_id((long) i);
@@ -288,5 +288,24 @@ class OrdersControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void 注文確定_商品リストが20件の場合200_OKが返るか() throws Exception {
+        List<OrderConfirmedRequest.Product> products = java.util.stream.IntStream.rangeClosed(1, 20)
+                .mapToObj(i -> {
+                    OrderConfirmedRequest.Product p = new OrderConfirmedRequest.Product();
+                    p.setProduct_id((long) i);
+                    p.setQuantity(1L);
+                    return p;
+                }).toList();
+
+        OrderConfirmedRequest request = new OrderConfirmedRequest();
+        request.setProducts(products);
+
+        mockMvc.perform(post("/api/v1/orders")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(request)))
+                .andExpect(status().isOk());
     }
 }

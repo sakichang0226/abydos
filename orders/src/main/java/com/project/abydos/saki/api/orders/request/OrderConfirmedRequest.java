@@ -21,7 +21,7 @@ public class OrderConfirmedRequest {
 
     /** 商品リスト */
     @Valid
-    @Size(min = 1, max = 100)
+    @Size(min = 1, max = 20)
     @NotEmpty
     private List<Product> products;
 
