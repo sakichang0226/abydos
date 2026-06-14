@@ -272,8 +272,8 @@ class OrdersControllerTest {
     }
 
     @Test
-    void 注文確定_商品リストが101件の場合バリデーションエラー() throws Exception {
-        List<OrderConfirmedRequest.Product> products = java.util.stream.IntStream.rangeClosed(1, 101)
+    void 注文確定_商品リストが21件の場合バリデーションエラー() throws Exception {
+        List<OrderConfirmedRequest.Product> products = java.util.stream.IntStream.rangeClosed(1, 21)
                 .mapToObj(i -> {
                     OrderConfirmedRequest.Product p = new OrderConfirmedRequest.Product();
                     p.setProduct_id((long) i);
