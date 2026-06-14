@@ -5,6 +5,7 @@ import com.project.abydos.saki.common.constant.ErrorCode;
 import com.project.abydos.saki.common.response.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -91,6 +92,19 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ErrorResponse> handleTypeMismatchException(MethodArgumentTypeMismatchException ex) {
+        ErrorCode code = ErrorCode.API_ERR001;
+        log.warn(CommonErrorLogMessage.VALIDATION_ERROR.getMessage(), ex.getMessage(), ex);
+        return new ResponseEntity<>(
+                new ErrorResponse(code.name(), code.getMessage()),
+                code.getHttpStatus()
+        );
+    }
+
+    /**
+     * リクエストボディの読み取り失敗ハンドラー.
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
         ErrorCode code = ErrorCode.API_ERR001;
         log.warn(CommonErrorLogMessage.VALIDATION_ERROR.getMessage(), ex.getMessage(), ex);
         return new ResponseEntity<>(
