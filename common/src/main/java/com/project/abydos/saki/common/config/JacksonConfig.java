@@ -19,9 +19,7 @@ public class JacksonConfig {
      */
     @Bean
     public Jackson2ObjectMapperBuilderCustomizer customizer() {
-        return builder -> builder.featuresToEnable(
-                DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES
-        ).featuresToDisable(
+        return builder -> builder.featuresToDisable(
                 DeserializationFeature.ACCEPT_FLOAT_AS_INT
         );
     }
