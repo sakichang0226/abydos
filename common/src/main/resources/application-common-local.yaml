@@ -1,0 +1,6 @@
+security:
+  jwt:
+    secret: local-dev-secret-key-for-testing-only
+  cookie:
+    secure: false
+    same-site: Lax

@@ -1,0 +1,21 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: products-api
+  profiles:
+    group:
+      local:
+        - common
+        - common-local
+        - dynamodb
+        - dynamodb-local
+      dev:
+        - common
+        - common-dev
+        - dynamodb
+        - dynamodb-dev
+  docker:
+    compose:
+      enabled: false
