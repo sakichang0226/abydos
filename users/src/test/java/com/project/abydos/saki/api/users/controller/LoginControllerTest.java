@@ -1,11 +1,12 @@
 package com.project.abydos.saki.api.users.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.abydos.saki.api.users.constant.UsersEndpoint;
 import com.project.abydos.saki.api.users.facade.LoginFacade;
 import com.project.abydos.saki.api.users.request.LoginRequest;
 import com.project.abydos.saki.api.users.response.LoginResponse;
+import com.project.abydos.saki.common.config.CookieProperties;
 import com.project.abydos.saki.common.constant.Endpoint;
-import com.project.abydos.saki.api.users.constant.UsersEndpoint;
 import com.project.abydos.saki.common.exception.GlobalExceptionHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,10 +21,11 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+/**
+ * {@link LoginController}に関するテストクラス
+ */
 @ExtendWith(SpringExtension.class)
 class LoginControllerTest {
 
@@ -35,10 +37,15 @@ class LoginControllerTest {
     @Mock
     private LoginFacade loginFacade;
 
+    @Mock
+    private CookieProperties cookieProperties;
+
     private ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setUp() {
+        when(cookieProperties.isSecure()).thenReturn(true);
+        when(cookieProperties.getSameSite()).thenReturn("Strict");
         mockMvc = MockMvcBuilders.standaloneSetup(loginController)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
@@ -90,5 +97,25 @@ class LoginControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error_code").value("API_ERR001"));
+    }
+
+    @Test
+    void ログアウト成功時にCookieが無効化され204が返却される() throws Exception {
+        mockMvc.perform(post(Endpoint.API_PREFIX + UsersEndpoint.LOGOUT))
+                .andExpect(status().isNoContent())
+                .andExpect(cookie().value("token", ""))
+                .andExpect(cookie().httpOnly("token", true))
+                .andExpect(cookie().secure("token", true))
+                .andExpect(cookie().path("token", "/"))
+                .andExpect(cookie().maxAge("token", 0));
+    }
+
+    @Test
+    void リクエストにCookieが設定されていない場合でも204が返却される() throws Exception {
+        mockMvc.perform(post(Endpoint.API_PREFIX + UsersEndpoint.LOGOUT)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andExpect(cookie().value("token", ""))
+                .andExpect(cookie().maxAge("token", 0));
     }
 }
