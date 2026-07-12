@@ -1,9 +1,9 @@
 package com.project.abydos.saki.api.users.controller;
 
+import com.project.abydos.saki.api.users.constant.UsersEndpoint;
+import com.project.abydos.saki.api.users.facade.LoginFacade;
 import com.project.abydos.saki.api.users.request.LoginRequest;
 import com.project.abydos.saki.api.users.response.LoginResponse;
-import com.project.abydos.saki.api.users.facade.LoginFacade;
-import com.project.abydos.saki.api.users.constant.UsersEndpoint;
 import com.project.abydos.saki.common.config.CookieProperties;
 import com.project.abydos.saki.common.constant.Endpoint;
 import com.project.abydos.saki.common.constant.SecurityConstant;
@@ -51,5 +51,28 @@ public class LoginController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(response);
+    }
+
+    /**
+     * Cookieに設定されたtokenのmaxAgeを0(期限切れ)にする
+     *
+     * @return 空レスポンス
+     */
+    @PostMapping(UsersEndpoint.LOGOUT)
+    public ResponseEntity<Void> logout() {
+        ResponseCookie cookie = ResponseCookie.from(SecurityConstant.TOKEN_COOKIE_NAME, "")
+                .httpOnly(true)
+                .secure(cookieProperties.isSecure())
+                .sameSite(cookieProperties.getSameSite())
+                .path("/")
+                .maxAge(0)
+                .build();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.SET_COOKIE, cookie.toString());
+
+        return ResponseEntity.noContent()
+                .headers(headers)
+                .build();
     }
 }
