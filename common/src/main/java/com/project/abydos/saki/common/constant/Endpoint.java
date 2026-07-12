@@ -12,6 +12,7 @@ public class Endpoint {
     public static final String ROOT = "/";
     public static final String HEALTH = "/health";
     public static final String LOGIN = "/login";
+    public static final String LOGOUT = "/logout";
     public static final String PRODUCTS = "/products";
     public static final String ORDERS = "/orders";
 
